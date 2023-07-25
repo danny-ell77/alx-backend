@@ -32,9 +32,7 @@ class Server:
         if self.__indexed_dataset is None:
             dataset = self.dataset()
             truncated_dataset = dataset[:1000]
-            print("truncated length", len(dataset))
             self.__indexed_dataset = {i: dataset[i] for i in range(len(dataset))}
-            print("indexed length", len(self.__indexed_dataset))
 
         return self.__indexed_dataset
 
