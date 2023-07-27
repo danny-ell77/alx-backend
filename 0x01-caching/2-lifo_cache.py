@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+""" BasicCache module
+"""
 from base_caching import BaseCaching
 
 
@@ -7,12 +10,14 @@ class LIFOCache(BaseCaching):
         self.cache_keys = []
 
     def get(self, key):
+        """returns a value"""
         if key is None:
             return
         if value := self.cache_data.get(key):
             return value
 
     def put(self, key, item):
+        """sets a value"""
         if key is None or item is None:
             return
         if len(self.cache_data) == self.MAX_ITEMS and key not in self.cache_keys:
