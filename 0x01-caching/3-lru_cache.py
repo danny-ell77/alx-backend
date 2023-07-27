@@ -1,42 +1,39 @@
-#!/usr/bin/python3
-""" BasicCache module
+#!/usr/bin/env python3
+"""Least Recently Used caching module.
 """
+from collections import OrderedDict
+
 from base_caching import BaseCaching
 
 
 class LRUCache(BaseCaching):
+    """Represents an object that allows storing and
+    retrieving items from a dictionary with a LRU
+    removal mechanism when the limit is reached.
+    """
     def __init__(self):
-        """initializes the class"""
+        """Initializes the cache.
+        """
         super().__init__()
-        self.usage_order = []
-
-    def get(self, key):
-        """gets a value"""
-        if key is None:
-            return None
-        value = self.cache_data.get(key)
-        if value is not None:
-            self.update_usage_order(key)
-        return value
+        self.cache_data = OrderedDict()
 
     def put(self, key, item):
-        """sets a value"""
+        """Adds an item in the cache.
+        """
         if key is None or item is None:
             return
-        if len(self.cache_data) == self.MAX_ITEMS and key not in self.cache_data:
-            self.evict_least_recently_used()
-        self.cache_data[key] = item
-        self.update_usage_order(key)
+        if key not in self.cache_data:
+            if len(self.cache_data) + 1 > BaseCaching.MAX_ITEMS:
+                lru_key, _ = self.cache_data.popitem(True)
+                print("DISCARD:", lru_key)
+            self.cache_data[key] = item
+            self.cache_data.move_to_end(key, last=False)
+        else:
+            self.cache_data[key] = item
 
-    def evict_least_recently_used(self):
-        """evicts least recently used key"""
-        lru_key = self.usage_order[0]
-        self.usage_order.pop(0)
-        self.cache_data.pop(lru_key)
-        print(f"DISCARD: {lru_key}")
-
-    def update_usage_order(self, key):
-        """updates the order of key usage"""
-        if key in self.usage_order:
-            self.usage_order.remove(key)
-        self.usage_order.append(key)
+    def get(self, key):
+        """Retrieves an item by key.
+        """
+        if key is not None and key in self.cache_data:
+            self.cache_data.move_to_end(key, last=False)
+        return self.cache_data.get(key, None)
